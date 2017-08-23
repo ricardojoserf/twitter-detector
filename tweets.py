@@ -101,7 +101,7 @@ def check_tweets(api, args):
 		track_word = q
 		timestamp("Searching for tweets (with %s)" % track_word)
 		myStream.filter(track=[track_word], async=True)
-	else if loc is not None:
+	elif loc is not None:
 		location = [float(x) for x in loc.split(",")]
 		timestamp("Searching for tweets (location: %s)" % location)
 		myStream.filter(locations=location, async=True)
