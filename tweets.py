@@ -86,7 +86,6 @@ class StdOutListener(tweepy.StreamListener):
         	csv_add_line(data)
         	timestamp(found_log)
         return True
-
     def on_error(self, status):
         return False
 
@@ -102,6 +101,7 @@ def check_tweets(api, args):
 		timestamp("Searching for tweets (with %s)" % track_word)
 		myStream.filter(track=[track_word], async=True)
 	elif loc is not None:
+		#44.419944,-10.454478,34.255792,3.005975
 		location = [float(x) for x in loc.split(",")]
 		timestamp("Searching for tweets (location: %s)" % location)
 		myStream.filter(locations=location, async=True)
