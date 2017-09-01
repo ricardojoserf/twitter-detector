@@ -13,6 +13,7 @@ def timestamp(text):
 	ts = time.time()
 	timestamp_ = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
 	total = "[%s]   %s" % (timestamp_,text)
+	# print total
 	logger_add_line(total+ " \n")
 
 
@@ -20,6 +21,7 @@ def get_args():
 	parser = argparse.ArgumentParser()
 	parser.add_argument('-q', '--word', required=False, action='store', help='Word')
 	parser.add_argument('-l', '--location', required=False, action='store', help='Location')
+	parser.add_argument('-c', '--configFile', required=False, action='store', help='Config file')
 	my_args = parser.parse_args()
 	return my_args
 
@@ -101,22 +103,26 @@ def check_tweets(api, args):
 		timestamp("Searching for tweets (with %s)" % track_word)
 		myStream.filter(track=[track_word], async=True)
 	elif loc is not None:
-		#44.419944,-10.454478,34.255792,3.005975
 		location = [float(x) for x in loc.split(",")]
 		timestamp("Searching for tweets (location: %s)" % location)
-		myStream.filter(locations=location, async=True)
+		myStream.filter(locations=location)
 	else:
 		print "Use -l for location or -q for searching query"
 		
 
 def main():	
 	args = get_args()
-	api_files_list = get_api_files()
-	for api_file in api_files_list:
+	config_file = args.configFile	
+	if config_file is not None:
+		api_file = os.path.splitext(config_file)[0]
+		#print file_name
 		api = generate_api(api_file)
-		check_tweets(api, args)
-
-
+		check_tweets(api,args)
+	else:
+		api_files_list = get_api_files()
+		for api_file in api_files_list:
+			api = generate_api(api_file)
+			check_tweets(api, args)
 
 if __name__ == "__main__":
     main()
