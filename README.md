@@ -1,5 +1,6 @@
 # twitter-detector
-Detect people in Twitter tweeting specific words
+Detect people in Twitter tweeting specific words. Testing it in a Raspberry Pi 2
+
 
 
 ## Usage
@@ -9,6 +10,7 @@ Detect people in Twitter tweeting specific words
 *python tweets.py -q basketball -c {CONFIG_FILE in api_data/}*
 
 **If -c s not used, it uses all config_files in api_data/**
+
 
 
 ## Examples

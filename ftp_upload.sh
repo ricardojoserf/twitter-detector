@@ -5,7 +5,6 @@ USER=$2
 PASSWORD=$3
 dir_results=$4
 
-#  Subir el nuevo vídeo
 ftp -inv $HOST <<EOF
 user $USER $PASSWORD
 cd /

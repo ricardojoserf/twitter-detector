@@ -13,7 +13,6 @@ def timestamp(text):
 	ts = time.time()
 	timestamp_ = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
 	total = "[%s]   %s" % (timestamp_,text)
-	# print total
 	logger_add_line(total+ " \n")
 
 
@@ -115,7 +114,6 @@ def main():
 	config_file = args.configFile	
 	if config_file is not None:
 		api_file = os.path.splitext(config_file)[0]
-		#print file_name
 		api = generate_api(api_file)
 		check_tweets(api,args)
 	else:
