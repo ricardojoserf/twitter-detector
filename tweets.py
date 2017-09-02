@@ -2,6 +2,7 @@ import sys,os,re,time,datetime
 import csv, json, argparse, tweepy, importlib
 from numpy import genfromtxt, recfromcsv
 from tweepy import OAuthHandler, Stream, StreamListener
+from polyglot.text import Text
 
 words_file = 'config/words.csv'
 logs_file = 'results/logs'
@@ -70,6 +71,27 @@ def get_api_files():
 			res.append(os.path.splitext(i)[0])
 	return res
 
+def getPolarity(init_text):
+	text = Text(init_text)
+	total_pol = 0.0
+	count=0
+	pol=0.0
+	for w in text.words: 
+		if(w.polarity!=0):
+			total_pol += w.polarity
+			count+=1
+	if count!=0:
+		pol = float(total_pol)/float(count)
+
+	rounded_pol="0"
+	if pol<0:
+		rounded_pol = "0"
+	elif pol == 0:
+		rounded_pol = "Nan"
+	else:
+		rounded_pol = "1"
+	return rounded_pol
+
 
 class StdOutListener(tweepy.StreamListener):
     def on_data(self, data):
@@ -82,8 +104,9 @@ class StdOutListener(tweepy.StreamListener):
         	if word in str(text.lower() ):
         		total += 1
         if total > 1:
-	       	found_log = "Adding (%s,%s) to csv. Tweet: %s" % (user, total, text)
-	       	data = [user, total, text]
+        	polarity = getPolarity(text)
+	       	found_log = "Adding (%s,%s) to csv. Tweet: %s. Polarity: %s" % (user, total, text, polarity)
+	       	data = [user, total, text, polarity]
         	csv_add_line(data)
         	timestamp(found_log)
         return True
