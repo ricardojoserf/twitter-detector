@@ -23,10 +23,10 @@ Detect people in Twitter tweeting specific words. Testing it in a Raspberry Pi 2
 
 ## Installation
 
-sudo apt install git python-pip python-dev build-essential python-numpy libicu-dev
+*sudo apt install git python-pip python-dev build-essential python-numpy libicu-dev*
 
-git clone https://github.com/rjruizfdez/twitter-detector
+*git clone https://github.com/rjruizfdez/twitter-detector*
 
-sudo pip install tweepy polyglot
+*sudo pip install tweepy polyglot*
 
-polyglot download sentiment2.en sentiment2.es sentiment2.fr sentiment2.ar sentiment2.ru sentiment2.hu
+*polyglot download sentiment2.en sentiment2.es sentiment2.fr sentiment2.ar sentiment2.ru sentiment2.hu*
