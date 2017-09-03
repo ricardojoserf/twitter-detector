@@ -85,11 +85,11 @@ def getPolarity(init_text):
 
 	rounded_pol="0"
 	if pol<0:
-		rounded_pol = "0"
+		rounded_pol = "Negative"
 	elif pol == 0:
-		rounded_pol = "Nan"
+		rounded_pol = "Neutral"
 	else:
-		rounded_pol = "1"
+		rounded_pol = "Positive"
 	return rounded_pol
 
 
@@ -104,7 +104,10 @@ class StdOutListener(tweepy.StreamListener):
         	if word in str(text.lower() ):
         		total += 1
         if total > 1:
-        	polarity = getPolarity(text)
+		try:
+	        	polarity = getPolarity(text)
+		except: 
+			polarity = "Nan"
 	       	found_log = "Adding (%s,%s) to csv. Tweet: %s. Polarity: %s" % (user, total, text, polarity)
 	       	data = [user, total, text, polarity]
         	csv_add_line(data)
