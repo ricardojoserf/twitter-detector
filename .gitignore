@@ -2,6 +2,7 @@
 config/api_data/
 results/users.csv
 results/logs
+results/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
