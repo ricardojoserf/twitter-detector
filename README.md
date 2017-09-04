@@ -9,8 +9,6 @@ Detect people in Twitter tweeting specific words. Testing it in a Raspberry Pi 2
 
 *python main.py --location={COORDINATES} -c {CONFIG_FILE in api_data/}*
 
-**If -c is not used, all config_files in api_data/ are used**
-
 
 
 ## Examples
