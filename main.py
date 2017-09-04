@@ -11,14 +11,6 @@ users_file = config.users_file
 config_folder = config.config_folder
 
 
-def log(text):
-	ts = time.time()
-	timestamp = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
-	total = "[%s]   %s \n" % (timestamp,text)
-	with open(logs_file, 'a') as file:
-		file.write(total)
-
-
 def get_args():
 	parser = argparse.ArgumentParser()
 	parser.add_argument('-q', '--word', required=False, action='store', help='Word to be searched. Example: basketball')
@@ -26,38 +18,6 @@ def get_args():
 	parser.add_argument('-c', '--configFile', required=False, action='store', help='Config file in api_data (ONLY NAME, WITHOUT ROUTE). Example: config1.py')
 	my_args = parser.parse_args()
 	return my_args
-
-
-def get_words():
-	res = []
-	words_array = recfromcsv(words_file, delimiter=',',dtype=None)
-	for line in words_array:
-		for word in line:
-			res.append(word)
-	return res
-
-
-def generate_api(module_name):
-	sys.path.insert(0, config_folder)
-	api_file = importlib.import_module(module_name)
-	consumer_key = api_file.consumer_key
-	consumer_secret = api_file.consumer_secret
-	access_token = api_file.access_token
-	access_token_secret = api_file.access_token_secret
-	try:
-		auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
-		auth.set_access_token(access_token, access_token_secret)
-		api = tweepy.API(auth)
-		log("Api created")
-		return api
-	except:
-		log("Error creating API")
-
-
-def csv_add_line(data):
-	csvFile = open(users_file, 'a')
-	csvWriter = csv.writer(csvFile)
-	csvWriter.writerow(data)
 
 
 def getPolarity(init_text):
@@ -71,7 +31,6 @@ def getPolarity(init_text):
 			count+=1
 	if count!=0:
 		pol = float(total_pol)/float(count)
-
 	rounded_pol="0"
 	if pol<0:
 		rounded_pol = "-"
@@ -80,6 +39,29 @@ def getPolarity(init_text):
 	else:
 		rounded_pol = "+"
 	return rounded_pol
+
+
+def get_words():
+	res = []
+	words_array = recfromcsv(words_file, delimiter=',',dtype=None)
+	for line in words_array:
+		for word in line:
+			res.append(word)
+	return res
+
+
+def log(text):
+	ts = time.time()
+	timestamp = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
+	total = "[%s]   %s \n" % (timestamp,text)
+	with open(logs_file, 'a') as file:
+		file.write(total)
+
+
+def csv_add_line(data):
+	csvFile = open(users_file, 'a')
+	csvWriter = csv.writer(csvFile)
+	csvWriter.writerow(data)
 
 
 class StdOutListener(tweepy.StreamListener):
@@ -122,7 +104,24 @@ def check_tweets(api, args):
 		myStream.filter(locations=location, async=True)
 	else:
 		print "Usage: python main.py -q {QUERY} -c {CONFIG_FILE} \npython main.py --location={LOCATION} -c {CONFIG_FILE in config/api_data} \n"
+
 		
+def generate_api(module_name):
+	sys.path.insert(0, config_folder)
+	api_file = importlib.import_module(module_name)
+	consumer_key = api_file.consumer_key
+	consumer_secret = api_file.consumer_secret
+	access_token = api_file.access_token
+	access_token_secret = api_file.access_token_secret
+	try:
+		auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
+		auth.set_access_token(access_token, access_token_secret)
+		api = tweepy.API(auth)
+		log("Api created")
+		return api
+	except:
+		log("Error creating API")
+
 
 def main():	
 	args = get_args()
