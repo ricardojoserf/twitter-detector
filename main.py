@@ -9,7 +9,7 @@ words_file = config.words_file
 logs_file = config.logs_file
 users_file = config.users_file
 config_folder = config.config_folder
-
+min_words = 2
 
 def get_args():
 	parser = argparse.ArgumentParser()
@@ -74,7 +74,7 @@ class StdOutListener(tweepy.StreamListener):
 		for word in words:
 			if word in str(text.lower()):
 				total += 1
-		if total > 1:
+		if total >= min_words:
 			try:
 				polarity = getPolarity(text)
 			except: 
@@ -94,13 +94,16 @@ def check_tweets(api, args):
 	args = get_args()
 	q = args.word
 	loc = args.location
+	global min_words
 	if q is not None:
 		track_word = q
 		log("Searching for tweets (with %s)" % track_word)
+		min_words = 2
 		myStream.filter(track=[track_word], async=True)
 	elif loc is not None:
 		location = [float(x) for x in loc.split(",")]
 		log("Searching for tweets (location: %s)" % location)
+		min_words = 1
 		myStream.filter(locations=location, async=True)
 	else:
 		print "Usage: python main.py -q {QUERY} -c {CONFIG_FILE} \npython main.py --location={LOCATION} -c {CONFIG_FILE in config/api_data} \n"
