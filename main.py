@@ -1,27 +1,29 @@
 import sys,os,re,time,datetime
 import csv, json, argparse, tweepy, importlib
+import config
 from numpy import genfromtxt, recfromcsv
 from tweepy import OAuthHandler, Stream, StreamListener
 from polyglot.text import Text
 
-words_file = 'config/words.csv'
-logs_file = 'results/logs'
-users_file = 'results/users.csv'
-config_folder='config/api_data'
+words_file = config.words_file
+logs_file = config.logs_file
+users_file = config.users_file
+config_folder = config.config_folder
 
 
-def timestamp(text):
+def log(text):
 	ts = time.time()
-	timestamp_ = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
-	total = "[%s]   %s" % (timestamp_,text)
-	logger_add_line(total+ " \n")
+	timestamp = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
+	total = "[%s]   %s \n" % (timestamp,text)
+	with open(logs_file, 'a') as file:
+		file.write(total)
 
 
 def get_args():
 	parser = argparse.ArgumentParser()
-	parser.add_argument('-q', '--word', required=False, action='store', help='Word')
-	parser.add_argument('-l', '--location', required=False, action='store', help='Location')
-	parser.add_argument('-c', '--configFile', required=False, action='store', help='Config file')
+	parser.add_argument('-q', '--word', required=False, action='store', help='Word to be searched. Example: basketball')
+	parser.add_argument('-l', '--location', required=False, action='store', help='Location to be searched. Example: -11.03,34.51,4.22,43.85 (Spain). More in http://boundingbox.klokantech.com/ (option CSV)')
+	parser.add_argument('-c', '--configFile', required=False, action='store', help='Config file in api_data (ONLY NAME, WITHOUT ROUTE). Example: config1.py')
 	my_args = parser.parse_args()
 	return my_args
 
@@ -46,30 +48,17 @@ def generate_api(module_name):
 		auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
 		auth.set_access_token(access_token, access_token_secret)
 		api = tweepy.API(auth)
-		timestamp("Api created")
+		log("Api created")
 		return api
 	except:
-		timestamp("Error creating API")
-
-
-def logger_add_line(data):
-	with open(logs_file, 'a') as file:
-		file.write(data)
+		log("Error creating API")
 
 
 def csv_add_line(data):
 	csvFile = open(users_file, 'a')
- 	csvWriter = csv.writer(csvFile)
+	csvWriter = csv.writer(csvFile)
 	csvWriter.writerow(data)
 
-
-def get_api_files():
-	res = []
-	files_list = os.listdir(config_folder)
-	for i in files_list:
-		if i.endswith('.py'):
-			res.append(os.path.splitext(i)[0])
-	return res
 
 def getPolarity(init_text):
 	text = Text(init_text)
@@ -85,36 +74,36 @@ def getPolarity(init_text):
 
 	rounded_pol="0"
 	if pol<0:
-		rounded_pol = "Negative"
+		rounded_pol = "-"
 	elif pol == 0:
-		rounded_pol = "Neutral"
+		rounded_pol = "0"
 	else:
-		rounded_pol = "Positive"
+		rounded_pol = "+"
 	return rounded_pol
 
 
 class StdOutListener(tweepy.StreamListener):
-    def on_data(self, data):
-        decoded = json.loads(data)
-        user = decoded['user']['screen_name'].encode('ascii', 'ignore')
-        text = decoded['text'].encode('ascii', 'ignore').encode('ascii', 'ignore').replace('\n', '   ')
-        words = get_words()
-        total = 0
-        for word in words:
-        	if word in str(text.lower() ):
-        		total += 1
-        if total > 1:
-		try:
-	        	polarity = getPolarity(text)
-		except: 
-			polarity = "Nan"
-	       	found_log = "Adding (%s,%s) to csv. Tweet: %s. Polarity: %s" % (user, total, text, polarity)
-	       	data = [user, total, text, polarity]
-        	csv_add_line(data)
-        	timestamp(found_log)
-        return True
-    def on_error(self, status):
-        return False
+	def on_data(self, data):
+		decoded = json.loads(data)
+		user = decoded['user']['screen_name'].encode('ascii', 'ignore')
+		text = decoded['text'].encode('ascii', 'ignore').encode('ascii', 'ignore').replace('\n', '   ')
+		words = get_words()
+		total = 0
+		for word in words:
+			if word in str(text.lower()):
+				total += 1
+		if total > 1:
+			try:
+				polarity = getPolarity(text)
+			except: 
+				polarity = "Language not installed in polyglot"
+			found_log = "Adding (%s,%s) to csv. Tweet: %s. Polarity: %s" % (user, total, text, polarity)
+			log(found_log)
+			data = [user, total, text, polarity]
+			csv_add_line(data)
+		return True
+	def on_error(self, status):
+		return False
 
 
 def check_tweets(api, args):
@@ -125,14 +114,14 @@ def check_tweets(api, args):
 	loc = args.location
 	if q is not None:
 		track_word = q
-		timestamp("Searching for tweets (with %s)" % track_word)
+		log("Searching for tweets (with %s)" % track_word)
 		myStream.filter(track=[track_word], async=True)
 	elif loc is not None:
 		location = [float(x) for x in loc.split(",")]
-		timestamp("Searching for tweets (location: %s)" % location)
-		myStream.filter(locations=location)
+		log("Searching for tweets (location: %s)" % location)
+		myStream.filter(locations=location, async=True)
 	else:
-		print "Use -l for location or -q for searching query"
+		print "Usage: python main.py -q {QUERY} -c {CONFIG_FILE} \npython main.py --location={LOCATION} -c {CONFIG_FILE in config/api_data} \n"
 		
 
 def main():	
@@ -142,11 +131,7 @@ def main():
 		api_file = os.path.splitext(config_file)[0]
 		api = generate_api(api_file)
 		check_tweets(api,args)
-	else:
-		api_files_list = get_api_files()
-		for api_file in api_files_list:
-			api = generate_api(api_file)
-			check_tweets(api, args)
+
 
 if __name__ == "__main__":
-    main()
+	main()

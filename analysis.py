@@ -1,9 +1,7 @@
 import csv, operator, argparse
+import config
 
-users_file = 'results/users.csv'
-low_limit = 0
-max_users = 5
-
+users_file = config.users_file
 
 def get_args():
 	parser = argparse.ArgumentParser()
