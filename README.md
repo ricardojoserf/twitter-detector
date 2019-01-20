@@ -1,30 +1,31 @@
 # twitter-detector
-Detect people in Twitter tweeting specific words. Testing it in a Raspberry Pi 2
-
+Detect people in Twitter tweeting specific words and analyze the data. Testing it in a Raspberry Pi 2
 
 
 ## Usage
+Create a listener from a word (query):
+```
+python main.py -q {WORD} -c {CONFIG_FILE in api_data/}
+```
 
-*python main.py -q {WORD} -c {CONFIG_FILE in api_data/}*
-
-*python main.py --location={COORDINATES} -c {CONFIG_FILE in api_data/}*
-
+Create a listener from a location:
+```
+python main.py --location={COORDINATES} -c {CONFIG_FILE in api_data/}
+```
 
 
 ## Examples
 
-*python main.py -q basketball -c config_file_1.py*
+```
+python main.py -q basketball -c config_file_1.py
 
-*python main.py --location=-18.26,27.5,4.64,43.85 -c config_file_2.py*
 
+python main.py --location=-18.26,27.5,4.64,43.85 -c config_file_2.py
+```
 
 
 ## Installation
 
-*sudo apt install git python-pip python-dev build-essential python-numpy libicu-dev*
-
-*sudo pip install tweepy polyglot*
-
-*polyglot download sentiment2.en sentiment2.es sentiment2.fr sentiment2.ar sentiment2.ru sentiment2.hu*
-
-*git clone https://github.com/rjruizfdez/twitter-detector && cd twitter-detector/*
+```
+sudo sh install/install.sh
+```

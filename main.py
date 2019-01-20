@@ -106,7 +106,7 @@ def check_tweets(api, args):
 		min_words = 1
 		myStream.filter(locations=location, async=True)
 	else:
-		print "Usage: python main.py -q {QUERY} -c {CONFIG_FILE} \npython main.py --location={LOCATION} -c {CONFIG_FILE in config/api_data} \n"
+		print ("Usage: python main.py -q {QUERY} -c {CONFIG_FILE} \npython main.py --location={LOCATION} -c {CONFIG_FILE in config/api_data} \n")
 
 		
 def generate_api(module_name):
