@@ -5,8 +5,8 @@ users_file = config.users_file
 
 def get_args():
 	parser = argparse.ArgumentParser()
-	parser.add_argument('-o', '--option', required=True, action='store', help='Option')
-	parser.add_argument('-n', '--number', required=True, action='store', help='Number')
+	parser.add_argument('-o', '--option', required=False, default="top", action='store', help='Option')
+	parser.add_argument('-n', '--number', required=False, default="5", action='store', help='Number')
 	my_args = parser.parse_args()
 	return my_args
 
